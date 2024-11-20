@@ -140,6 +140,9 @@ class ExcelSplitterApp(QtWidgets.QWidget):
             # 对合并后的数据去重（基于元组）
             unique_data = list(dict.fromkeys(tuple(row)
                                for row in combined_data))
+            
+            total_rows = len(unique_data)
+            self.progress_bar.setMaximum(total_rows)
 
             # 按需处理导出的字段
             output_data = []
@@ -154,7 +157,7 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                         str(row[header_index["金额"]]).strip() if row[header_index["金额"]] else "",  # 金额
                         "",  # 校验码，固定为空
                       ]
-                elif row[header_index["数电发票"]]: # 纸质发票
+                elif row[header_index["发票号码"]]: # 纸质发票
                     mapped_row = [
                         "数电发票（专票）",  # 发票类型
                         str(row[header_index["发票代码"]]).strip() if row[header_index["发票代码"]] else "",   # 发票代码
@@ -183,6 +186,7 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                 self.progress_bar.setValue(i + len(chunk))
                 self.export_to_excel(chunk, output_path)
                 file_count += 1
+                
 
             # 提示用户完成
             QtWidgets.QMessageBox.information(
