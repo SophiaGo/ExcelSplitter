@@ -140,7 +140,7 @@ class ExcelSplitterApp(QtWidgets.QWidget):
             # 对合并后的数据去重（基于元组）
             unique_data = list(dict.fromkeys(tuple(row)
                                for row in combined_data))
-            
+
             total_rows = len(unique_data)
             self.progress_bar.setMaximum(total_rows)
 
@@ -151,22 +151,29 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                 if row[header_index["数电票号码"]]:  # 电子发票
                     mapped_row = [
                         "数电发票（专票）",  # 发票类型
-                        "", # 发票代码
-                        str(row[header_index["数电票号码"]]).strip() if row[header_index["数电票号码"]] else "",   # 发票号码
-                        str(row[header_index["开票日期"]]).split()[0] if row[header_index["开票日期"]] else "",  # 开票日期
-                        str(row[header_index["金额"]]).strip() if row[header_index["金额"]] else "",  # 金额
-                        "",  # 校验码，固定为空
-                      ]
-                elif row[header_index["发票号码"]]: # 纸质发票
-                    mapped_row = [
-                        "数电发票（专票）",  # 发票类型
-                        str(row[header_index["发票代码"]]).strip() if row[header_index["发票代码"]] else "",   # 发票代码
-                        str(row[header_index["发票号码"]]).strip() if row[header_index["发票号码"]] else "",   # 发票号码
-                        str(row[header_index["开票日期"]]).split()[0] if row[header_index["开票日期"]] else "",  # 开票日期
-                        str(row[header_index["金额"]]).strip() if row[header_index["金额"]] else "",  # 金额
+                        "",  # 发票代码
+                        str(row[header_index["数电票号码"]]).strip(
+                        ) if row[header_index["数电票号码"]] else "",   # 发票号码
+                        str(row[header_index["开票日期"]]).split()[
+                            0] if row[header_index["开票日期"]] else "",  # 开票日期
+                        str(row[header_index["金额"]]).strip(
+                        ) if row[header_index["金额"]] else "",  # 金额
                         "",  # 校验码，固定为空
                     ]
-                  
+                elif row[header_index["发票号码"]]:  # 纸质发票
+                    mapped_row = [
+                        "数电发票（专票）",  # 发票类型
+                        str(row[header_index["发票代码"]]).strip(
+                        ) if row[header_index["发票代码"]] else "",   # 发票代码
+                        str(row[header_index["发票号码"]]).strip(
+                        ) if row[header_index["发票号码"]] else "",   # 发票号码
+                        str(row[header_index["开票日期"]]).split()[
+                            0] if row[header_index["开票日期"]] else "",  # 开票日期
+                        str(row[header_index["金额"]]).strip(
+                        ) if row[header_index["金额"]] else "",  # 金额
+                        "",  # 校验码，固定为空
+                    ]
+
                 mapped_row = [
                     str(item).strip() if item is not None else "" for item in mapped_row]
                 output_data.append(mapped_row)
@@ -186,7 +193,6 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                 self.progress_bar.setValue(i + len(chunk))
                 self.export_to_excel(chunk, output_path)
                 file_count += 1
-                
 
             # 提示用户完成
             QtWidgets.QMessageBox.information(
@@ -197,7 +203,6 @@ class ExcelSplitterApp(QtWidgets.QWidget):
             )
         except Exception as e:
             QtWidgets.QMessageBox.critical(self, "错误", f"处理出错：{str(e)}")
-
 
     def process_row(self, row):
         """处理一行数据并返回导出格式"""
@@ -246,7 +251,7 @@ class ExcelSplitterApp(QtWidgets.QWidget):
         )
         sheet.add_data_validation(dv)
 
-    # 应用到“发票类型”字段的所有单元格
+        # 应用到“发票类型”字段的所有单元格
         for row in sheet.iter_rows(min_row=2, max_row=len(data) + 1, min_col=1, max_col=1):
             for cell in row:
                 dv.add(cell)
