@@ -20,9 +20,9 @@ QListWidget {
 }
 
 QProgressBar {
-  color: #101825;
+  color: #101825; 
+  height: 1px;
   border: 1px solid #ccc;
-  text-align: center;
   background-color: #FFFFFF;
 }
 

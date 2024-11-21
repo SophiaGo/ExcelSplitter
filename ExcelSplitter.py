@@ -37,7 +37,8 @@ class ExcelSplitterApp(QtWidgets.QWidget):
 
         # 进度条
         self.progress_bar = QtWidgets.QProgressBar()
-        self.progress_bar.setValue(0)
+        self.progress_bar.setTextVisible(False)
+        # self.progress_bar.setValue(0)
 
         # 操作按钮
         self.process_button = QtWidgets.QPushButton("处理并导出")
@@ -230,28 +231,6 @@ class ExcelSplitterApp(QtWidgets.QWidget):
             )
         except Exception as e:
             QtWidgets.QMessageBox.critical(self, "错误", f"处理出错：{str(e)}")
-
-    def process_row(self, row):
-        """处理一行数据并返回导出格式"""
-        try:
-            发票类型 = "数电发票（专票）"
-            发票代码 = row[1] if row[0] else ""
-            发票号码 = row[2] if row[2] else ""
-            开票日期 = row[3].split(" ")[0] if row[3] else ""
-            金额 = row[4]
-            校验码 = row[5] if row[5] else ""
-
-            # 去除空格
-            return [
-                str(发票类型).strip(),
-                str(发票代码).strip(),
-                str(发票号码).strip(),
-                str(开票日期).strip(),
-                str(金额).strip(),
-                str(校验码).strip(),
-            ]
-        except Exception:
-            return None
 
     def export_to_excel(self, data, file_path):
         """导出数据到 Excel 文件"""
