@@ -1,0 +1,37 @@
+QPushButton {
+  background-color: #5478ba;
+  color: white;
+  border: none;
+  padding: 4px 4px;
+  border-radius: 5px;
+}
+
+QPushButton:pressed {
+  background-color: #436094; /* 鼠标按下时的颜色 */
+}
+
+QPushButton:hover {
+  background-color: #436094; /* 鼠标按下时的颜色 */
+}
+
+QListWidget {
+  background-color: #FFFFFF; /* 背景 */
+  border: 1px solid #ccc;
+}
+
+QProgressBar {
+  color: #101825;
+  border: 1px solid #ccc;
+  text-align: center;
+  background-color: #FFFFFF;
+}
+
+QProgressBar::chunk {
+  background-color: #06C687;   /* 进度部分的颜色 */
+  width: 3px;
+}
+
+QListWidget::item:selected {
+  background-color: #436094;  /* 选中项背景色 */
+  color: #ffffff;             /* 选中项文本颜色 */
+}

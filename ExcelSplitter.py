@@ -9,7 +9,7 @@ class ExcelSplitterApp(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Excel拆分工具")
-        self.setGeometry(200, 200, 600, 400)
+        self.setGeometry(200, 200, 400, 400)
         self.setAcceptDrops(True)
 
         # 初始化界面
@@ -23,7 +23,7 @@ class ExcelSplitterApp(QtWidgets.QWidget):
         # 文件选择区
         self.file_label = QtWidgets.QLabel("拖入Excel文件或点击“浏览”按钮选择文件。")
         self.file_label.setStyleSheet(
-            "background-color: #f0f0f0; border: 1px solid #ccc; padding: 10px;")
+            "background-color: #F7F8FA; border: 1px solid #ccc; padding: 10px;")
         self.file_label.setAlignment(QtCore.Qt.AlignCenter)
         self.file_label.setFixedHeight(50)
 
@@ -111,6 +111,16 @@ class ExcelSplitterApp(QtWidgets.QWidget):
         except Exception as e:
             QtWidgets.QMessageBox.critical(self, "处理失败", f"处理过程中出错：{e}")
 
+    def is_not_blank(self, item):
+        if str(item).strip() == '--':
+            return False
+        elif len(str(item).strip()) == 0:
+            return False
+        elif item and str(item).strip():
+            return True
+        else:
+            return False
+
     def merge_and_export(self):
         """从多个 sheet 合并数据（去重），并导出"""
         try:
@@ -148,25 +158,42 @@ class ExcelSplitterApp(QtWidgets.QWidget):
             output_data = []
             for row in unique_data:
                 mapped_row = []
-                if row[header_index["数电票号码"]]:  # 电子发票
+                # 纸质发票-普通发票
+                if self.is_not_blank(row[header_index["发票号码"]]) and not self.is_not_blank(row[header_index["发票代码"]]):
+                    # if row[header_index["数电票号码"]] and str(row[header_index["数电票号码"]]).strip():
                     mapped_row = [
-                        "数电发票（专票）",  # 发票类型
-                        "",  # 发票代码
-                        str(row[header_index["数电票号码"]]).strip(
-                        ) if row[header_index["数电票号码"]] else "",   # 发票号码
+                        "增值税普通发票",  # 发票类型
+                        str(row[header_index["发票代码"]]).strip(
+                        ) if row[header_index["发票代码"]] else "",   # 发票代码
+                        str(row[header_index["发票号码"]]).strip(
+                        ) if row[header_index["发票号码"]] else "",   # 发票号码
                         str(row[header_index["开票日期"]]).split()[
                             0] if row[header_index["开票日期"]] else "",  # 开票日期
                         str(row[header_index["金额"]]).strip(
                         ) if row[header_index["金额"]] else "",  # 金额
                         "",  # 校验码，固定为空
                     ]
-                elif row[header_index["发票号码"]]:  # 纸质发票
+                # 纸质发票-专用发票
+                if self.is_not_blank(row[header_index["发票号码"]]) and self.is_not_blank(row[header_index["发票代码"]]):
                     mapped_row = [
-                        "数电发票（专票）",  # 发票类型
+                        "增值税专用发票",  # 发票类型
                         str(row[header_index["发票代码"]]).strip(
                         ) if row[header_index["发票代码"]] else "",   # 发票代码
                         str(row[header_index["发票号码"]]).strip(
                         ) if row[header_index["发票号码"]] else "",   # 发票号码
+                        str(row[header_index["开票日期"]]).split()[
+                            0] if row[header_index["开票日期"]] else "",  # 开票日期
+                        str(row[header_index["金额"]]).strip(
+                        ) if row[header_index["金额"]] else "",  # 金额
+                        "",  # 校验码，固定为空
+                    ]
+                # 电子发票
+                if self.is_not_blank(row[header_index["数电票号码"]]):
+                    mapped_row = [
+                        "数电发票（专票）",  # 发票类型
+                        "",  # 发票代码
+                        str(row[header_index["数电票号码"]]).strip(
+                        ) if row[header_index["数电票号码"]] else "",   # 发票号码
                         str(row[header_index["开票日期"]]).split()[
                             0] if row[header_index["开票日期"]] else "",  # 开票日期
                         str(row[header_index["金额"]]).strip(
@@ -237,10 +264,6 @@ class ExcelSplitterApp(QtWidgets.QWidget):
         for row in data:
             sheet.append(row)
 
-        # 设置默认值
-        for cell in sheet["A"][1:]:  # "A" 列，跳过表头
-            cell.value = "数电发票（专票）"
-
         dv = DataValidation(
             type="list",
             formula1='"增值税专用发票,增值税电子专用发票,增值税普通发票,增值税电子普通发票,机动车销售统一发票,卷式发票,二手车发票,通行费发票,数电发票（专票）,数电发票（普票）,货物运输业增值税专用发票"',
@@ -266,6 +289,9 @@ class ExcelSplitterApp(QtWidgets.QWidget):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
+    with open("style.qss", "r") as file:
+        app.setStyleSheet(file.read())
+
     window = ExcelSplitterApp()
     window.show()
     app.exec_()
