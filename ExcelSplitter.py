@@ -9,7 +9,7 @@ class ExcelSplitterApp(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Excel拆分工具")
-        self.setGeometry(200, 200, 400, 400)
+        self.setGeometry(200, 200, 600, 600)
         self.setAcceptDrops(True)
 
         # 初始化界面
@@ -223,12 +223,14 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                 file_count += 1
 
             # 提示用户完成
+
             QtWidgets.QMessageBox.information(
                 self,
                 "拆分成功",
                 f"拆分成功：\n总数据 {len(output_data)} 条\n拆分文件 {file_count} 个。\n"
-                f"拆分后的文件保存于：{output_dir}"
+                f"拆分后的文件保存于：{output_dir}",
             )
+
         except Exception as e:
             QtWidgets.QMessageBox.critical(self, "错误", f"处理出错：{str(e)}")
 
@@ -266,10 +268,50 @@ class ExcelSplitterApp(QtWidgets.QWidget):
         workbook.save(file_path)
 
 
+def load_stylesheet():
+    return """
+QPushButton {
+  background-color: #5478ba;
+  color: white;
+  border: none;
+  padding: 4px 4px;
+  border-radius: 5px;
+}
+
+QPushButton:pressed {
+  background-color: #436094; /* 鼠标按下时的颜色 */
+}
+
+QPushButton:hover {
+  background-color: #436094; /* 鼠标按下时的颜色 */
+}
+
+QListWidget {
+  background-color: #FFFFFF; /* 背景 */
+  border: 1px solid #ccc;
+}
+
+QProgressBar {
+  color: #101825; 
+  height: 1px;
+  border: 1px solid #ccc;
+  background-color: #FFFFFF;
+}
+
+QProgressBar::chunk {
+  background-color: #06C687;   /* 进度部分的颜色 */
+  width: 3px;
+}
+
+QListWidget::item:selected {
+  background-color: #436094;  /* 选中项背景色 */
+  color: #ffffff;             /* 选中项文本颜色 */
+}
+"""
+
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
-    with open("style.qss", "r") as file:
-        app.setStyleSheet(file.read())
+    app.setStyleSheet(load_stylesheet())
 
     window = ExcelSplitterApp()
     window.show()
