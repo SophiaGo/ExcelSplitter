@@ -1,5 +1,5 @@
 import os, sys
-import traceback
+# import traceback
 if hasattr(sys, "frozen"):
     os.environ["PATH"] = sys._MEIPASS + ";" + os.environ["PATH"]
 from PyQt5 import QtWidgets, QtCore
