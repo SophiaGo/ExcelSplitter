@@ -28,7 +28,7 @@ class ExcelSplitterApp(QtWidgets.QWidget):
         self.file_label.setStyleSheet(
             "background-color: #F7F8FA; border: 1px solid #ccc; padding: 10px;")
         self.file_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.file_label.setFixedHeight(50)
+        self.file_label.setFixedHeight(100)
 
         self.browse_button = QtWidgets.QPushButton("浏览")
         self.browse_button.clicked.connect(self.browse_file)
@@ -173,8 +173,8 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                         ) if row[header_index["发票号码"]] else "",   # 发票号码
                         str(row[header_index["开票日期"]]).split()[
                             0] if row[header_index["开票日期"]] else "",  # 开票日期
-                        str(row[header_index["金额"]]).strip(
-                        ) if row[header_index["金额"]] else "",  # 金额
+                        str(row[header_index["价税合计"]]).strip(
+                        ) if row[header_index["价税合计"]] else "",  # 价税合计
                         "",  # 校验码，固定为空
                     ]
                 # 纸质发票-专用发票
@@ -187,8 +187,8 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                         ) if row[header_index["发票号码"]] else "",   # 发票号码
                         str(row[header_index["开票日期"]]).split()[
                             0] if row[header_index["开票日期"]] else "",  # 开票日期
-                        str(row[header_index["金额"]]).strip(
-                        ) if row[header_index["金额"]] else "",  # 金额
+                        str(row[header_index["价税合计"]]).strip(
+                        ) if row[header_index["价税合计"]] else "",  # 价税合计
                         "",  # 校验码，固定为空
                     ]
                 # 电子发票
@@ -200,8 +200,8 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                         ) if row[header_index["数电票号码"]] else "",   # 发票号码
                         str(row[header_index["开票日期"]]).split()[
                             0] if row[header_index["开票日期"]] else "",  # 开票日期
-                        str(row[header_index["金额"]]).strip(
-                        ) if row[header_index["金额"]] else "",  # 金额
+                        str(row[header_index["价税合计"]]).strip(
+                        ) if row[header_index["价税合计"]] else "",  # 价税合计
                         "",  # 校验码，固定为空
                     ]
 
@@ -220,7 +220,7 @@ class ExcelSplitterApp(QtWidgets.QWidget):
             for i in range(0, len(output_data), chunk_size):
                 chunk = output_data[i:i + chunk_size]
                 output_path = os.path.join(
-                    output_dir, f"发票信息模板_拆分表{file_count + 1}.xlsx")
+                    output_dir, f"fp{file_count + 1}.xls")
                 self.progress_bar.setValue(i + len(chunk))
                 self.export_to_excel(chunk, output_path)
                 file_count += 1
