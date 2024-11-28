@@ -165,6 +165,7 @@ class ExcelSplitterApp(QtWidgets.QWidget):
 
                 # 按输入表字段收集数据
                 for row in data_rows:
+                    invoice_type = str(row[header_index["发票票种"]]).strip() if row[header_index["发票票种"]] else None
                     invoice_number = str(row[header_index["发票号码"]]).strip() if row[header_index["发票号码"]] else None
                     electronic_invoice_number = str(row[header_index["数电票号码"]]).strip() if row[header_index["数电票号码"]] else None
                     invoice_code = str(row[header_index["发票代码"]]).strip() if row[header_index["发票代码"]] else ""
@@ -180,7 +181,7 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                         continue  # 如果两者都为空则跳过
 
                     # 合并数据并求和
-                    invoice_map[invoice_key]['发票类型'] = "数电发票（专票）" if electronic_invoice_number else "增值税专用发票"  # 根据发票类型设置
+                    invoice_map[invoice_key]['发票票种'] = invoice_type if invoice_type else ""
                     invoice_map[invoice_key]['发票代码'] = invoice_code if invoice_code else ""
                     invoice_map[invoice_key]['发票号码'] = invoice_number if invoice_number else electronic_invoice_number
                     invoice_map[invoice_key]['数电票号码'] = electronic_invoice_number if electronic_invoice_number else ""
@@ -200,19 +201,12 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                     data["发票代码"]
                 ):
                     mapped_row = [
-                        "增值税普通发票",  # 发票类型
-                        str(data["发票代码"]).strip()
-                        if data["发票代码"]
-                        else "",  # 发票代码
-                        str(data["发票号码"]).strip()
-                        if data["发票号码"]
-                        else "",  # 发票号码
-                        str(data["开票日期"]).split()[0]
-                        if data["开票日期"]
-                        else "",  # 开票日期
-                        str(data["价税合计"]).strip()
-                        if data["价税合计"]
-                        else "",  # 价税合计
+                        # "增值税普通发票",  # 发票类型
+                        str(data["发票票种"]).strip() if data["发票票种"] else "",
+                        str(data["发票代码"]).strip() if data["发票代码"] else "",  # 发票代码
+                        str(data["发票号码"]).strip() if data["发票号码"] else "",  # 发票号码
+                        str(data["开票日期"]).split()[0] if data["开票日期"] else "",  # 开票日期
+                        str(data["价税合计"]).strip() if data["价税合计"] else "",  # 价税合计
                         "",  # 校验码，固定为空
                     ]
                 # 纸质发票-专用发票
@@ -220,19 +214,12 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                     data["发票代码"]
                 ):
                     mapped_row = [
-                        "增值税专用发票",  # 发票类型
-                        str(data["发票代码"]).strip()
-                        if data["发票代码"]
-                        else "",  # 发票代码
-                        str(data["发票号码"]).strip()
-                        if data["发票号码"]
-                        else "",  # 发票号码
-                        str(data["开票日期"]).split()[0]
-                        if data["开票日期"]
-                        else "",  # 开票日期
-                        str(data["价税合计"]).strip()
-                        if data["价税合计"]
-                        else "",  # 价税合计
+                        # "增值税专用发票",  
+                        str(data["发票票种"]).strip() if data["发票票种"] else "", # 发票类型
+                        str(data["发票代码"]).strip() if data["发票代码"] else "",  # 发票代码
+                        str(data["发票号码"]).strip() if data["发票号码"] else "",  # 发票号码
+                        str(data["开票日期"]).split()[0] if data["开票日期"] else "",  # 开票日期
+                        str(data["价税合计"]).strip() if data["价税合计"] else "",  # 价税合计
                         "",  # 校验码，固定为空
                     ]
                 # 电子发票
@@ -240,15 +227,9 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                     mapped_row = [
                         "数电发票（专票）",  # 发票类型
                         "",  # 发票代码
-                        str(data["数电票号码"]).strip()
-                        if data["数电票号码"]
-                        else "",  # 发票号码
-                        str(data["开票日期"]).split()[0]
-                        if data["开票日期"]
-                        else "",  # 开票日期
-                        str(data["价税合计"]).strip()
-                        if data["价税合计"]
-                        else "",  # 价税合计
+                        str(data["数电票号码"]).strip() if data["数电票号码"] else "",  # 发票号码
+                        str(data["开票日期"]).split()[0] if data["开票日期"] else "",  # 开票日期
+                        str(data["价税合计"]).strip() if data["价税合计"] else "",  # 价税合计
                         "",  # 校验码，固定为空
                     ]
 
