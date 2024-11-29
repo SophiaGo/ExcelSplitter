@@ -1,4 +1,5 @@
-import os, sys
+import os
+import sys
 import traceback
 if hasattr(sys, "frozen"):
     os.environ["PATH"] = sys._MEIPASS + ";" + os.environ["PATH"]
@@ -108,7 +109,8 @@ class ExcelSplitterApp(QtWidgets.QWidget):
 
         # 获取选中的 Sheets
         selected_items = self.sheet_list_widget.selectedItems()
-        self.selected_sheets = [item.text().split("（")[0] for item in selected_items]
+        self.selected_sheets = [item.text().split("（")[0]
+                                for item in selected_items]
 
         if not self.selected_sheets:
             QtWidgets.QMessageBox.warning(self, "未选择Sheet", "请至少选择一个Sheet！")
@@ -134,7 +136,7 @@ class ExcelSplitterApp(QtWidgets.QWidget):
         try:
             # 打开文件
             workbook = load_workbook(self.file_path)
-            
+
             # 存储每个发票号码或数电票号码对应的合并数据
             invoice_map = defaultdict(
                 lambda: {
@@ -162,18 +164,26 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                 headers = rows[0]
                 data_rows = rows[1:]
 
-                header_index = {header: idx for idx, header in enumerate(headers)}
+                header_index = {header: idx for idx,
+                                header in enumerate(headers)}
 
                 # 按输入表字段收集数据
                 for row in data_rows:
-                    invoice_type = str(row[header_index["发票票种"]]).strip() if row[header_index["发票票种"]] else None
-                    invoice_number = str(row[header_index["发票号码"]]).strip() if row[header_index["发票号码"]] else None
-                    electronic_invoice_number = str(row[header_index["数电票号码"]]).strip() if row[header_index["数电票号码"]] else None
-                    invoice_code = str(row[header_index["发票代码"]]).strip() if row[header_index["发票代码"]] else ""
-                    invoice_date = str(row[header_index["开票日期"]]).split()[0] if row[header_index["开票日期"]] else ""
-                    tax_and_total = float(row[header_index["价税合计"]]) if row[header_index["价税合计"]] else 0.0
-                    
-                    amount = float(row[header_index["金额"]]) if row[header_index["金额"]] else 0.0
+                    invoice_type = str(row[header_index["发票票种"]]).strip(
+                    ) if row[header_index["发票票种"]] else None
+                    invoice_number = str(row[header_index["发票号码"]]).strip(
+                    ) if row[header_index["发票号码"]] else None
+                    electronic_invoice_number = str(row[header_index["数电票号码"]]).strip(
+                    ) if row[header_index["数电票号码"]] else None
+                    invoice_code = str(row[header_index["发票代码"]]).strip(
+                    ) if row[header_index["发票代码"]] else ""
+                    invoice_date = str(row[header_index["开票日期"]]).split()[
+                        0] if row[header_index["开票日期"]] else ""
+                    tax_and_total = float(
+                        row[header_index["价税合计"]]) if row[header_index["价税合计"]] else 0.0
+
+                    amount = float(row[header_index["金额"]]
+                                   ) if row[header_index["金额"]] else 0.0
 
                     # 合并“发票号码”或“数电票号码”相同的行
                     if invoice_number:
@@ -198,29 +208,38 @@ class ExcelSplitterApp(QtWidgets.QWidget):
 
             # 按需处理导出的字段
             output_data = []
+            output_data_ordinary = []
             for invoice_key, data in invoice_map.items():
                 mapped_row = []
                 # 纸质发票-普通发票
                 if self.is_not_blank(data["发票号码"]) and self.is_not_blank(
-                    data["发票代码"]) and (str(data["发票票种"]).strip() in ['增值税电子普通发票', '增值税普通发票']):                
+                        data["发票代码"]) and (str(data["发票票种"]).strip() in ['增值税电子普通发票', '增值税普通发票']):
                     mapped_row = [
                         # "增值税普通发票",  # 发票类型
                         str(data["发票票种"]).strip() if data["发票票种"] else "",
-                        str(data["发票代码"]).strip() if data["发票代码"] else "",  # 发票代码
-                        str(data["发票号码"]).strip() if data["发票号码"] else "",  # 发票号码
-                        str(data["开票日期"]).split()[0] if data["开票日期"] else "",  # 开票日期
-                        str(data["价税合计"]).strip() if data["价税合计"] else "",  # 价税合计
+                        str(data["发票代码"]).strip(
+                        ) if data["发票代码"] else "",  # 发票代码
+                        str(data["发票号码"]).strip(
+                        ) if data["发票号码"] else "",  # 发票号码
+                        str(data["开票日期"]).split()[
+                            0] if data["开票日期"] else "",  # 开票日期
+                        str(data["价税合计"]).strip(
+                        ) if data["价税合计"] else "",  # 价税合计
                         "",  # 校验码，固定为空
                     ]
                 # 纸质发票-专用发票
                 if self.is_not_blank(data["发票号码"]) and self.is_not_blank(
-                    data["发票代码"]) and (str(data["发票票种"]).strip() in ['增值税电子专用发票', '增值税专用发票']):                
+                        data["发票代码"]) and (str(data["发票票种"]).strip() in ['增值税电子专用发票', '增值税专用发票']):
                     mapped_row = [
-                        # "增值税专用发票",  
-                        str(data["发票票种"]).strip() if data["发票票种"] else "", # 发票类型
-                        str(data["发票代码"]).strip() if data["发票代码"] else "",  # 发票代码
-                        str(data["发票号码"]).strip() if data["发票号码"] else "",  # 发票号码
-                        str(data["开票日期"]).split()[0] if data["开票日期"] else "",  # 开票日期
+                        # "增值税专用发票",
+                        str(data["发票票种"]).strip(
+                        ) if data["发票票种"] else "",  # 发票类型
+                        str(data["发票代码"]).strip(
+                        ) if data["发票代码"] else "",  # 发票代码
+                        str(data["发票号码"]).strip(
+                        ) if data["发票号码"] else "",  # 发票号码
+                        str(data["开票日期"]).split()[
+                            0] if data["开票日期"] else "",  # 开票日期
                         str(data["金额"]).strip() if data["金额"] else "",  # 价税合计
                         "",  # 校验码，固定为空
                     ]
@@ -228,11 +247,15 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                 if self.is_not_blank(data["数电票号码"]):
                     mapped_row = [
                         # 发票类型映射
-                        "数电发票（专票）" if str(data["发票票种"]).strip() == "数电票（增值税专用发票）" else "数电发票（普票）",  # 发票类型
+                        "数电发票（专票）" if str(data["发票票种"]).strip(
+                        ) == "数电票（增值税专用发票）" else "数电发票（普票）",  # 发票类型
                         "",  # 发票代码
-                        str(data["数电票号码"]).strip() if data["数电票号码"] else "",  # 发票号码
-                        str(data["开票日期"]).split()[0] if data["开票日期"] else "",  # 开票日期
-                        str(data["价税合计"]).strip() if data["价税合计"] else "",  # 价税合计
+                        str(data["数电票号码"]).strip(
+                        ) if data["数电票号码"] else "",  # 发票号码
+                        str(data["开票日期"]).split()[
+                            0] if data["开票日期"] else "",  # 开票日期
+                        str(data["价税合计"]).strip(
+                        ) if data["价税合计"] else "",  # 价税合计
                         "",  # 校验码，固定为空
                     ]
 
@@ -240,10 +263,14 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                     str(item).strip() if item is not None else "" for item in mapped_row
                 ]
                 if not mapped_row:
-                  continue
-                output_data.append(mapped_row)
+                    continue
 
-            # 导出
+                if mapped_row[0] in ['增值税电子普通发票', '增值税普通发票']:
+                    output_data_ordinary.append(mapped_row)
+                else:
+                    output_data.append(mapped_row)
+
+            # 导出目录选择
             output_dir = QtWidgets.QFileDialog.getExistingDirectory(
                 self, "选择导出目录"
             )
@@ -251,11 +278,21 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                 return
 
             chunk_size = 20
+            file_count_ordinary = 0
+            for i in range(0, len(output_data_ordinary), chunk_size):
+                chunk = output_data_ordinary[i: i + chunk_size]
+                output_path = os.path.join(
+                    output_dir, f"pt{file_count_ordinary + 1}.xls")
+                self.progress_bar.setValue(i + len(chunk))
+                self.export_to_excel(chunk, output_path)
+                file_count_ordinary += 1
+
             file_count = 0
             for i in range(0, len(output_data), chunk_size):
-                chunk = output_data[i : i + chunk_size]
-                output_path = os.path.join(output_dir, f"fp{file_count + 1}.xls")
-                self.progress_bar.setValue(i + len(chunk))
+                chunk = output_data[i: i + chunk_size]
+                output_path = os.path.join(
+                    output_dir, f"fp{file_count + 1}.xls")
+                self.progress_bar.setValue(len(output_data_ordinary) + i + len(chunk))
                 self.export_to_excel(chunk, output_path)
                 file_count += 1
 
@@ -263,16 +300,16 @@ class ExcelSplitterApp(QtWidgets.QWidget):
             QtWidgets.QMessageBox.information(
                 self,
                 "拆分成功",
-                f"拆分成功：\n总数据 {len(output_data)} 条\n拆分文件 {file_count} 个。\n"
+                f"拆分成功：\n总数据 {len(output_data)+len(output_data_ordinary)} 条\n拆分文件 {file_count+file_count_ordinary} 个。\n"
                 f"拆分后的文件保存于：{output_dir}"
                 f"\n\n注意：增值税电子普通发票、增值税普通发票这两种类型，需在pt开头文件中补充校验码后6位。",
             )
 
         except Exception as e:
             # 调试使用
-            error_msg = traceback.format_exc()  # 获取完整的堆栈信息
-            QtWidgets.QMessageBox.critical(self, "错误", f"处理出错：\n{error_msg}")
-            # QtWidgets.QMessageBox.critical(self, "错误", f"处理出错：{str(e)}")
+            # error_msg = traceback.format_exc()  # 获取完整的堆栈信息
+            # QtWidgets.QMessageBox.critical(self, "错误", f"处理出错：\n{error_msg}")
+            QtWidgets.QMessageBox.critical(self, "错误", f"处理出错：{str(e)}")
 
     def export_to_excel(self, data, file_path):
         """导出数据到 Excel 文件"""
@@ -298,7 +335,8 @@ class ExcelSplitterApp(QtWidgets.QWidget):
 
         for row_num in range(1, len(data) + 1):
             for col_num in range(len(headers)):
-                sheet.write(row_num, col_num, data[row_num - 1][col_num], style)
+                sheet.write(row_num, col_num,
+                            data[row_num - 1][col_num], style)
 
         # 保存文件
         workbook.save(file_path)
