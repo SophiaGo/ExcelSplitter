@@ -1,5 +1,5 @@
 import os, sys
-# import traceback
+import traceback
 if hasattr(sys, "frozen"):
     os.environ["PATH"] = sys._MEIPASS + ";" + os.environ["PATH"]
 from PyQt5 import QtWidgets, QtCore
@@ -145,6 +145,7 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                     "开票日期": "",
                     "价税合计": 0.0,
                     "校验码": "",
+                    "金额": 0.0,
                 }
             )
 
@@ -171,6 +172,8 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                     invoice_code = str(row[header_index["发票代码"]]).strip() if row[header_index["发票代码"]] else ""
                     invoice_date = str(row[header_index["开票日期"]]).split()[0] if row[header_index["开票日期"]] else ""
                     tax_and_total = float(row[header_index["价税合计"]]) if row[header_index["价税合计"]] else 0.0
+                    
+                    amount = float(row[header_index["金额"]]) if row[header_index["金额"]] else 0.0
 
                     # 合并“发票号码”或“数电票号码”相同的行
                     if invoice_number:
@@ -187,6 +190,7 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                     invoice_map[invoice_key]['数电票号码'] = electronic_invoice_number if electronic_invoice_number else ""
                     invoice_map[invoice_key]['开票日期'] = invoice_date  # 保证日期一致
                     invoice_map[invoice_key]['价税合计'] += tax_and_total  # 累加税价合计
+                    invoice_map[invoice_key]['金额'] += amount  # 金额
                     invoice_map[invoice_key]['校验码'] = ""  # 校验码固定为空
 
             total_rows = len(invoice_map)
@@ -197,9 +201,8 @@ class ExcelSplitterApp(QtWidgets.QWidget):
             for invoice_key, data in invoice_map.items():
                 mapped_row = []
                 # 纸质发票-普通发票
-                if self.is_not_blank(data["发票号码"]) and not self.is_not_blank(
-                    data["发票代码"]
-                ):
+                if self.is_not_blank(data["发票号码"]) and self.is_not_blank(
+                    data["发票代码"]) and (str(data["发票票种"]).strip() in ['增值税电子普通发票', '增值税普通发票']):                
                     mapped_row = [
                         # "增值税普通发票",  # 发票类型
                         str(data["发票票种"]).strip() if data["发票票种"] else "",
@@ -211,21 +214,21 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                     ]
                 # 纸质发票-专用发票
                 if self.is_not_blank(data["发票号码"]) and self.is_not_blank(
-                    data["发票代码"]
-                ):
+                    data["发票代码"]) and (str(data["发票票种"]).strip() in ['增值税电子专用发票', '增值税专用发票']):                
                     mapped_row = [
                         # "增值税专用发票",  
                         str(data["发票票种"]).strip() if data["发票票种"] else "", # 发票类型
                         str(data["发票代码"]).strip() if data["发票代码"] else "",  # 发票代码
                         str(data["发票号码"]).strip() if data["发票号码"] else "",  # 发票号码
                         str(data["开票日期"]).split()[0] if data["开票日期"] else "",  # 开票日期
-                        str(data["价税合计"]).strip() if data["价税合计"] else "",  # 价税合计
+                        str(data["金额"]).strip() if data["金额"] else "",  # 价税合计
                         "",  # 校验码，固定为空
                     ]
                 # 电子发票
                 if self.is_not_blank(data["数电票号码"]):
                     mapped_row = [
-                        "数电发票（专票）",  # 发票类型
+                        # 发票类型映射
+                        "数电发票（专票）" if str(data["发票票种"]).strip() == "数电票（增值税专用发票）" else "数电发票（普票）",  # 发票类型
                         "",  # 发票代码
                         str(data["数电票号码"]).strip() if data["数电票号码"] else "",  # 发票号码
                         str(data["开票日期"]).split()[0] if data["开票日期"] else "",  # 开票日期
@@ -236,6 +239,8 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                 mapped_row = [
                     str(item).strip() if item is not None else "" for item in mapped_row
                 ]
+                if not mapped_row:
+                  continue
                 output_data.append(mapped_row)
 
             # 导出
@@ -265,9 +270,9 @@ class ExcelSplitterApp(QtWidgets.QWidget):
 
         except Exception as e:
             # 调试使用
-            # error_msg = traceback.format_exc()  # 获取完整的堆栈信息
-            # QtWidgets.QMessageBox.critical(self, "错误", f"处理出错：\n{error_msg}")
-            QtWidgets.QMessageBox.critical(self, "错误", f"处理出错：{str(e)}")
+            error_msg = traceback.format_exc()  # 获取完整的堆栈信息
+            QtWidgets.QMessageBox.critical(self, "错误", f"处理出错：\n{error_msg}")
+            # QtWidgets.QMessageBox.critical(self, "错误", f"处理出错：{str(e)}")
 
     def export_to_excel(self, data, file_path):
         """导出数据到 Excel 文件"""
