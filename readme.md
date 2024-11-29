@@ -13,3 +13,5 @@ git rm -r --cached .
 git add .
 git commit -m "update gitignore"
 
+# 安装依赖
+pip install -r requirements.txt

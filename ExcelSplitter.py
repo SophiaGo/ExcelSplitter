@@ -13,7 +13,7 @@ class ExcelSplitterApp(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Excel拆分工具")
-        self.setGeometry(200, 200, 600, 600)
+        self.setGeometry(200, 200, 560, 660)  # 宽 高
         self.setAcceptDrops(True)
 
         # 初始化界面
@@ -27,7 +27,7 @@ class ExcelSplitterApp(QtWidgets.QWidget):
         # 文件选择区
         self.file_label = QtWidgets.QLabel("拖入Excel文件或点击“浏览”按钮选择文件。")
         self.file_label.setStyleSheet(
-            "background-color: #F7F8FA; border: 1px solid #ccc; padding: 10px;"
+            "background-color: #F7F8FA; border: 1px solid #ccc; padding: 10px; font-weight: bold;"
         )
         self.file_label.setAlignment(QtCore.Qt.AlignCenter)
         self.file_label.setFixedHeight(100)
@@ -297,14 +297,15 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                 file_count += 1
 
             # 提示用户完成
-            QtWidgets.QMessageBox.information(
-                self,
-                "拆分成功",
-                f"拆分成功：\n总数据 {len(output_data)+len(output_data_ordinary)} 条\n拆分文件 {file_count+file_count_ordinary} 个"
+            msgBox = QtWidgets.QMessageBox()
+            msgBox.setWindowTitle("提示")
+            msgBox.setText(f"拆分成功：\n总数据 {len(output_data)+len(output_data_ordinary)} 条\n拆分文件 {file_count+file_count_ordinary} 个"
                 f"\n拆分后的文件保存于：{output_dir}"
                 f"\n\nfp开头文件可直接使用，请上传发票管理系统查验发票。"
-                f"\n\npt开头文件包含\"增值税电子普通发票\"、\"增值税普通发票\"两种类型，若需查验文档内发票，请在表内补充发票校验码后6位。",
-            )
+                f"\n\n⚠️注意：pt开头文件包含\"增值税电子普通发票\"、\"增值税普通发票\"两种类型，若需查验文档内发票，请在表内补充发票校验码后6位。",)
+            msgBox.setStyleSheet("QLabel{min-width: 600px; min-height: 371px;}")  
+            msgBox.exec_()
+
 
         except Exception as e:
             # 调试使用
@@ -345,44 +346,51 @@ class ExcelSplitterApp(QtWidgets.QWidget):
 
 def load_stylesheet():
     return """
-QPushButton {
-  background-color: #5478ba;
-  color: white;
-  border: none;
-  padding: 4px 4px;
-  border-radius: 5px;
-}
+        QWidget {
+            font-size: 20px;  /* 设置窗口字体大小为16px */
+        }
+        QPushButton {
+            background-color: #5478ba;
+            color: white;
+            border: none;
+            padding: 4px 4px;
+            border-radius: 5px;
+            height: 40px;
+            font-size: 20px;
+            font-weight: bold;
+        }
 
-QPushButton:pressed {
-  background-color: #436094; /* 鼠标按下时的颜色 */
-}
+        QPushButton:pressed {
+            background-color: #436094; /* 鼠标按下时的颜色 */
+        }
 
-QPushButton:hover {
-  background-color: #436094; /* 鼠标按下时的颜色 */
-}
+        QPushButton:hover {
+            background-color: #436094; /* 鼠标按下时的颜色 */
+        }
 
-QListWidget {
-  background-color: #FFFFFF; /* 背景 */
-  border: 1px solid #ccc;
-}
+        QListWidget {
+            background-color: #FFFFFF; /* 背景 */
+            border: 1px solid #ccc;
+        }
 
-QProgressBar {
-  color: #101825; 
-  height: 1px;
-  border: 1px solid #ccc;
-  background-color: #FFFFFF;
-}
+        QProgressBar {
+            color: #101825; 
+            height: 1px;
+            border: 1px solid #ccc;
+            background-color: #FFFFFF;
+        }
 
-QProgressBar::chunk {
-  background-color: #06C687;   /* 进度部分的颜色 */
-  width: 3px;
-}
+        QProgressBar::chunk {
+            background-color: #06C687;   /* 进度部分的颜色 */
+            width: 3px;
+        }
 
-QListWidget::item:selected {
-  background-color: #436094;  /* 选中项背景色 */
-  color: #ffffff;             /* 选中项文本颜色 */
-}
-"""
+        QListWidget::item:selected {
+            background-color: #436094;  /* 选中项背景色 */
+            color: #ffffff;             /* 选中项文本颜色 */
+            font-weight: bold;
+        }
+    """
 
 
 if __name__ == "__main__":
