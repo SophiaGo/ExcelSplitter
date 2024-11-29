@@ -12,3 +12,4 @@ python==3.6.10
 git rm -r --cached .
 git add .
 git commit -m "update gitignore"
+

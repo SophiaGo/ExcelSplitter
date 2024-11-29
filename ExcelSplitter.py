@@ -255,12 +255,12 @@ class ExcelSplitterApp(QtWidgets.QWidget):
                 file_count += 1
 
             # 提示用户完成
-
             QtWidgets.QMessageBox.information(
                 self,
                 "拆分成功",
                 f"拆分成功：\n总数据 {len(output_data)} 条\n拆分文件 {file_count} 个。\n"
-                f"拆分后的文件保存于：{output_dir}",
+                f"拆分后的文件保存于：{output_dir}"
+                f"\n\n注意：增值税电子普通发票、增值税普通发票这两种类型，需在pt开头文件中补充校验码后6位。",
             )
 
         except Exception as e:
