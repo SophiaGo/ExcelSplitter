@@ -300,9 +300,10 @@ class ExcelSplitterApp(QtWidgets.QWidget):
             QtWidgets.QMessageBox.information(
                 self,
                 "拆分成功",
-                f"拆分成功：\n总数据 {len(output_data)+len(output_data_ordinary)} 条\n拆分文件 {file_count+file_count_ordinary} 个。\n"
-                f"拆分后的文件保存于：{output_dir}"
-                f"\n\n注意：增值税电子普通发票、增值税普通发票这两种类型，需在pt开头文件中补充校验码后6位。",
+                f"拆分成功：\n总数据 {len(output_data)+len(output_data_ordinary)} 条\n拆分文件 {file_count+file_count_ordinary} 个"
+                f"\n拆分后的文件保存于：{output_dir}"
+                f"\n\nfp开头文件可直接使用，请上传发票管理系统查验发票。"
+                f"\n\npt开头文件包含\"增值税电子普通发票\"、\"增值税普通发票\"两种类型，若需查验文档内发票，请在表内补充发票校验码后6位。",
             )
 
         except Exception as e:
